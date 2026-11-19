@@ -6,14 +6,14 @@ caminando aunque Streamlit vuelva a dibujar la página.
 """
 import streamlit as st
 
-VERSION = "8"
+VERSION = "9"
 
 _BOOT = f"""<script>
 (function () {{
   if (window.KanastaProfe || document.getElementById("kp-js")) return;
   var s = document.createElement("script");
   s.id = "kp-js";
-  s.src = "/app/static/profe/profe.js?v={VERSION}";
+  s.src = "app/static/profe/profe.js?v={VERSION}";   // ruta relativa: en Streamlit Cloud la app vive en /~/+/
   document.head.appendChild(s);
 }})();
 </script>"""
