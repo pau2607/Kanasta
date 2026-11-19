@@ -4,7 +4,7 @@
    los clics, avisos y toasts de la página. */
 (() => {
   if (window.KanastaProfe) return;
-  const BASE = "/app/static/profe/";
+  const BASE = new URL(".", document.getElementById("kp-js").src).href;   // carpeta de este archivo (sirve local y en Streamlit Cloud)
   const ESC = 2, FW = 48 * ESC, FH = 58 * ESC;          // 96 × 116 px: múltiplo exacto = píxeles nítidos
   const ANIM = {"idle":[140,140,140,140,140,140,140,140,140,140,140,140],"hablar":[110,110,110,110,110,110,110,110],"caminar":[100,100,100,100,100,100,100,100],"saludo":[140,140,140,140,140,140,140,140],"feliz":[80,80,80,80,80,80,80,80,80,80],"celebrar":[80,80,80,80,80,80,80,80,80,80,80,80],"aplaudir":[100,100,100,100,100,100,100,100],"galactico":[110,110,110,110,110,110,110,110,110,110,110,110],"pensar":[200,200,200,200,200,200,200,200],"duda":[140,140,140,140,140,140,140,140],"sorpresa":[90,90,90,90,300,300],"triste":[160,160,160,160,160,160,160,160],"favorito":[110,110,110,110,110,110,110,110],"pina_colada":[200,150,150,200,140,140,140,140,140,140,120,120,120,120,120,120],"bailar":[130,130,130,130,130,130,130,130],"reir":[90,90,90,90,90,90,90,90],"negar":[120,120,120,120,120,120,120,120],"senalar":[150,150,150,150,150,150],"lentes":[200,150,150,110,110,110,110,110,110,110,110,110],"dormir":[160,160,160,160,160,160,160,160,160,160,160,160],"leer":[160,160,160,160,160,160,160,160,160,160,160,160],"retrato":[1000]};                                   // {nombre: [duraciones_ms por frame]}
   const MANOS = { x: FW / 2, y: 74 };                      // dónde lleva el producto (frente al pecho)
