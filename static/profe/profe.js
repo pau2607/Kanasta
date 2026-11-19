@@ -19,7 +19,7 @@
   // ------------------------------------------------------------------ estilos
   const css = document.createElement("style");
   css.textContent = `
-  #kp-root{position:fixed;left:0;top:0;width:${FW}px;height:${FH}px;z-index:100000;pointer-events:none;
+  #kp-root{position:fixed;left:0;top:0;width:${FW}px;height:${FH}px;z-index:2147483000;pointer-events:none;
            will-change:transform;}
   #kp-sprite{width:${FW}px;height:${FH}px;image-rendering:pixelated;background-repeat:no-repeat;
              pointer-events:auto;cursor:pointer;filter:drop-shadow(0 3px 2px rgba(0,0,0,.18));}
@@ -37,7 +37,7 @@
   .kp-globo:after{content:"";position:absolute;left:calc(50% - var(--cola, 0px));bottom:-9px;margin-left:-7px;border:7px solid transparent;
                   border-top-color:#1F1F1F;border-bottom:0;}
   .kp-globo.abajo:after{bottom:auto;top:-9px;border-top:0;border-bottom:7px solid #1F1F1F;}
-  .kp-item{position:fixed;z-index:100001;font-size:26px;line-height:1;pointer-events:none;
+  .kp-item{position:fixed;z-index:2147483001;font-size:26px;line-height:1;pointer-events:none;
            filter:drop-shadow(0 2px 1px rgba(0,0,0,.25));transition:transform .35s ease,opacity .35s ease;}
   .kp-item.pop{animation:kpPop .35s ease;}
   @keyframes kpPop{0%{transform:scale(.2)}70%{transform:scale(1.35)}100%{transform:scale(1)}}
@@ -156,12 +156,26 @@
     const r = a.getBoundingClientRect();
     return r.width && r.bottom > 0 ? r : null;
   }
+  // dónde está el producto ahora (la tarjeta en la página); si no se ve, lo saca de su bolsillo
+  function ubicarOrigen(o) {
+    const el = o.tarjeta && document.querySelector("." + o.tarjeta + " .k-tile");
+    const hdr = document.querySelector('[data-testid="stLayoutWrapper"]:has(> .st-key-hdr)');
+    const techo = hdr ? hdr.getBoundingClientRect().bottom : 0;
+    if (el) {
+      const r = el.getBoundingClientRect();
+      const x = r.left + r.width / 2, y = r.top + r.height / 2;
+      if (r.width && y > techo + 20 && y < innerHeight - 20 && x > 0 && x < innerWidth) return { x, y, enMano: false };
+    }
+    return { x: pos.x + MANOS.x, y: pos.y + MANOS.y - 13, enMano: true };
+  }
   async function entregar(origen) {
+    const o = ubicarOrigen(origen);
     const item = document.createElement("div");
     item.className = "kp-item pop"; item.textContent = origen.emoji || "📦";
-    item.style.left = origen.x - 13 + "px"; item.style.top = origen.y - 13 + "px";
+    item.style.left = o.x - 13 + "px"; item.style.top = o.y - 13 + "px";
     document.body.appendChild(item);
-    await caminar(origen.x - MANOS.x, origen.y - MANOS.y + 10);      // ir por el producto
+    if (!o.enMano) await caminar(o.x - MANOS.x, o.y - MANOS.y + 10);  // ir por el producto
+    else await dormirMs(350);
     item.classList.remove("pop");
     item.style.position = "absolute";                                  // agarrarlo: ahora viaja con él
     item.style.left = MANOS.x - 13 + "px"; item.style.top = MANOS.y - 26 + "px";
@@ -190,6 +204,8 @@
 
   // ------------------------------------------------------------------ detectar qué pasa en la página
   let pendiente = null;   // producto que se acaba de agregar (esperando confirmación de la app)
+  let ultimaTarjeta = null;  // tarjeta desde la que se abrió el detalle con "Ver"
+  const claveTarjeta = (el) => { const c = el && [...el.classList].find((k) => k.startsWith("st-key-card_")); return c || null; };
   function emojiDe(tile) {
     if (!tile) return null;
     const textos = [...tile.childNodes].filter((n) => n.nodeType === 3 && n.textContent.trim());
@@ -201,12 +217,14 @@
     if (!b) return;
     const lineas = (b.innerText || "").split("\n").map((x) => x.trim()).filter(Boolean);
     const t = lineas.length ? lineas[lineas.length - 1] : "";              // sin el nombre del ícono
-    if (t === "Agregar" || t.startsWith("Agregar ·")) {
-      const cont = b.closest('[class*="st-key-card_"]') || b.closest('[role="dialog"]') ||
-                   b.closest('[data-testid="stVerticalBlockBorderWrapper"]');
+    if (t === "Ver") {
+      ultimaTarjeta = claveTarjeta(b.closest('[class*="st-key-card_"]'));
+    } else if (t === "Agregar" || t.startsWith("Agregar ·")) {
+      const carta = b.closest('[class*="st-key-card_"]'), dialogo = b.closest('[role="dialog"]');
+      const cont = carta || dialogo || b.closest('[data-testid="stVerticalBlockBorderWrapper"]');
       const tile = cont && cont.querySelector(".k-tile");
-      const r = (tile || b).getBoundingClientRect();
-      pendiente = { x: r.left + r.width / 2, y: r.top + r.height / 2, emoji: emojiDe(tile), t: Date.now() };
+      // desde el detalle, el profe va a la tarjeta del producto en la página (el detalle se cierra)
+      pendiente = { tarjeta: carta ? claveTarjeta(carta) : (dialogo ? ultimaTarjeta : null), emoji: emojiDe(tile), t: Date.now() };
     } else if (t === "Enviar opinión") {
       encolar(() => reaccion("aplaudir", "¡Gracias por opinar! 👏", 2));
     } else if (t.includes("Guardar en favoritos")) {
