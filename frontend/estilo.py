@@ -102,8 +102,10 @@ h1, h2, h3, h4 {{ letter-spacing: -0.02em; }}
 .k-logo small {{ display:block; font-size:0.68rem; color:{TINTA_3}; font-weight:500; letter-spacing:0; margin-top:3px; }}
 .k-ubic {{ font-size:0.8rem; color:{TINTA_3}; line-height:1.15; }}
 .k-ubic b {{ color:{TINTA}; font-size:0.92rem; }}
-.st-key-hdr {{ border-bottom:1px solid {BORDE}; padding:0.5rem 0 0.6rem 0; margin-bottom:0.4rem;
-               position:sticky; top:0; z-index:990; background:#FFFFFF; }}
+.st-key-hdr {{ border-bottom:1px solid {BORDE}; padding:0.5rem 0 0.6rem 0; margin-bottom:0.4rem; background:#FFFFFF; }}
+/* barra superior fija al deslizar: el sticky va en el envoltorio que Streamlit pone alrededor del contenedor */
+[data-testid="stLayoutWrapper"]:has(> .st-key-hdr) {{ position:sticky; top:0; z-index:990; background:#FFFFFF;
+                                                      box-shadow:0 6px 12px -10px rgba(0,0,0,.18); }}
 [data-testid="stElementContainer"]:has(> [data-testid="stHtml"]) {{ display:none; }}
 .st-key-hdr [data-testid="stPageLink"] a {{ border-radius:999px; padding:0.25rem 0.8rem; }}
 .st-key-hdr [data-testid="stPageLink"] a:hover {{ background:{CORAL_SUAVE}; }}

@@ -6,7 +6,7 @@ caminando aunque Streamlit vuelva a dibujar la página.
 """
 import streamlit as st
 
-VERSION = "9"
+VERSION = "10"
 
 _BOOT = f"""<script>
 (function () {{
