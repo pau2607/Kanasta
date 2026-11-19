@@ -1,0 +1,22 @@
+[theme]
+base = "light"
+primaryColor = "#FF5533"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F6F6F7"
+textColor = "#1F1F1F"
+borderColor = "#ECECEC"
+font = "Poppins:https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap, sans-serif"
+headingFont = "Poppins:https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap, sans-serif"
+baseRadius = "large"
+buttonRadius = "full"
+showWidgetBorder = true
+
+[server]
+headless = true
+enableStaticServing = true
+
+[browser]
+gatherUsageStats = false
+
+[client]
+toolbarMode = "minimal"
